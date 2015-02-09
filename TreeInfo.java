@@ -41,21 +41,46 @@ public class TreeInfo{
 		//(if the file exists, it gets overwritten)
 		java.io.FileWriter output = new java.io.FileWriter(fileout);
 
+		//create species as a parallel array.
+		java.io.File speciesFile = new java.io.File("species_list.txt");
+		if (!speciesFile.exists()){
+				System.err.println("No such file");
+				System.exit(1);
+			}
+		String[] sp1 = new String[120];
+		String[] sp2 = new String[120];
+		Scanner speciesScanner = new Scanner(speciesFile);
+		int i = 0;
+		while (speciesScanner.hasNext()){
+			sp1[i]=speciesScanner.next().toString();
+			sp2[i]=speciesScanner.next().toString();
+			sp2[i]+=speciesScanner.next().toString();
+			sp2[i]+=speciesScanner.next().toString();
+			sp2[i]+=speciesScanner.next().toString();
+			speciesScanner.nextLine();
+			i++;
+		}
+
 		//read data from the input file (same methods as we used for reading
 		//from the user) 
 		while (input.hasNext()) {
-			String id = input.next();
+			String id = input.next().;
 			String st = input.next();
 			String xs1 = input.next();
 			String xs2 = input.next();
 			input.next();
 			int dia= input.nextInt();
 			String sp = input.next();
+			for i in range(len(sp1)){
+				if sp.equals(sp1[i]){
+					sp=sp2[i];
+				}
+			}
 			String bor = input.next();
 			String zip = input.next();
 			tList.add1(new Tree(id,st,xs1,xs2,dia,sp,bor,zip));
 			input.nextLine();
-			System.out.println(zip);
+			System.out.println(zip);//test
 		}
 
 		// Close the file
