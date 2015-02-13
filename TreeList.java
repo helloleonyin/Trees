@@ -3,7 +3,7 @@ import java.util.*;
 
 public class TreeList {
 	int count = 0; 
-	int countS;
+	int countS = 0;
 	int countZ;
 	ArrayList<Tree> list;
 	ArrayList<ZipCode> listZ;
@@ -18,70 +18,109 @@ public class TreeList {
 
 	public void add1(Tree tree1){
 		this.list.add(tree1);
+
+		String spt=tree1.getSpecies();
+		int LSS= listS.size(); // listS size
 		
-		String spt=tree1.getSpecies(); //populates species ArrayList
-		if(!this.listS.contains(spt)){ //if the species is not in the species arraylist, add it with one occurance.
-			Species SP = new Species(spt,1);
-			this.listS.add(SP);
+		if(LSS==0){
+			Species tSP1 = new Species(spt,1);
+			listS.add(tSP1);
 			countS++;
 		}
 		else{
-			int i = this.listS.indexOf(spt);//the index of the species is found and the count is updated
-			listS.get(i).setSPC(listS.get(i).getSPC()+1);
+			boolean HEY=false;
+			int x;
+			for (x=0;x<LSS;x++){
+				if (listS.get(x).getSP().equals(spt)){
+					listS.get(x).setSPC(listS.get(x).getSPC()+1);//increments speciesCount.
+					HEY= true;
+					break;
+				}
+			}
+			if(HEY==false) {
+				listS.add(new Species(spt,1)); //add new species to listS with count 1
+				countS++;
+			}
 		}
-
-		int zp=tree1.getZip();
-		if(!this.listZ.contains(zp)){ //if the species is not in the species arraylist, add it with one occurance.
-			ZipCode ZP = new ZipCode(zp,1);
-			this.listZ.add(ZP);
+		
+		int zpt=tree1.getZip();
+		int LZS= listZ.size(); // listZ size
+		
+		if(LZS==0){
+			ZipCode tZP = new ZipCode(zpt);
+			listZ.add(tZP);
 			countZ++;
 		}
 		else{
-			int i = this.listZ.indexOf(zp);//otherwise the index of the species is found and the count is updated
-			listZ.get(i).setZC(listZ.get(i).getZC()+1);
+			boolean HEY=false;
+			int x;
+			for (x=0;x<LZS;x++){
+				if (listZ.get(x).getZP()==zpt){
+					listZ.get(x).setZC(listZ.get(x).getZC()+1);//increments speciesCount.
+					HEY= true;
+					break;
+				}
+			}
+			if(HEY==false) {
+				listZ.add(new ZipCode(zpt,1)); //add new species to listZ with count 1
+				countZ++;
+			}
 		}
 		count++;
 	}
 	
+	//Getter Functions
 	public ArrayList<Tree> getList() {
 		return this.list;
-	}
-	
-	public Tree getTree(int x){
-		return this.list.get(x);
-	}
-	public int getCount(){
-		return count;
 	}
 	
 	public ArrayList<Species> getListS() {
 		return listS;
 	}
 	
-	public void treeTop3(){
-		listS.sortBySpecies();
+	public ArrayList<ZipCode> getListZ() {
+		return listZ;
 	}
 	
-	private class ZipCode implements Comparable<ZipCode>{
+	public Tree getTree(int x){
+		return this.list.get(x);
+	}
+	
+	public int getCountS(){
+		return countS;
+	}
+	public int getCountZ(){
+		return countZ;
+	}
+	public int getCount(){
+		return count;
+	}
+	
+	
+	public class ZipCode implements Comparable<ZipCode>{
 		int zipCode;
 		int zipCount;
-		private ZipCode(int zip, int zipC){
+		public ZipCode(int zip, int zipC){
 			this.zipCode=zip;
 			this.zipCount=zipC;		
 		}
-		private ZipCode getZP(int y){
+		public ZipCode(int zip){
+			this.zipCode=zip;	
+		}
+		
+		public ZipCode getZP(int y){
 			return listZ.get(y);
 		}
-		private int getZP(){
+		public int getZP(){
 			return zipCode;
 		}
-		private int getZC(){
+		public int getZC(){
 			return zipCount;
 		}
-		private void setZC(int ZPP){
+		public void setZC(int ZPP){
 			this.zipCount=ZPP;
 		}
-		private ArrayList<ZipCode> getListZ() {
+		public ArrayList<ZipCode> getListZ() {
 			return listZ;
 		}
 		
@@ -101,84 +140,58 @@ public class TreeList {
 	public class Species implements Comparable<Species>{
 		String species;
 		int speciesCount;
-		private Species(String sp, int spC){
+		public Species(String sp, int spC){
 			this.species = sp;
 			this.speciesCount=spC;		
 		}
 		
-		private String getSP(){
+		public Species(String sp){
+			this.species = sp;	
+		}
+		
+		public String getSP(){
 			return species;
 		}
-		private int getSPC(){
+		public int getSPC(){
 			return speciesCount;
 		}
-		private void setSPC(int SC){
+		
+		public void setSPC(int SC){
 			this.speciesCount=SC;
 		}
-		/*
-		public String sortSpecies(){
-			int x;
-			int mx3=0;
-			int mx2=0;
-			int mx1=0;
-			int mn=0;
-			int i3=0;
-			int i2=0;
-			int i1=0;
-			for (x=0;x<countS;x++){
-				if (mx3>=listS.get(x).getSPC()){
-					mx3=listS.get(x).getSPC();
-					i3 = x;
-					if (mx3>=mx2){
-						int tmx = mx2;
-						mx2=mx3;
-						mx3= tmx;
-						int iT = i2;
-						i2 = x;
-						i3 = iT;
-						if (mx2>=mx1){
-							tmx = mx1;
-							mx1=mx2;
-							mx2= tmx;
-							iT = i1;
-							i1 = x;
-							i2 = iT;
-						}
-					}
-						
-				}
-			}
-			return ("Most Popular Trees:\n\t"+listS.getSP(i1)+" "+mx1+"\n\t"+listS.get(i2)+" "+mx2+"\n\t"+listS.get(i3)+" "+mx3);
-		}*/
 		
-
+		public void setSP(String SP){
+			this.species=SP;
+		}
+		
 		public ArrayList<Species> listSpecies(){
 		    Collections.sort(listS);
 		    return listS;
 		}
-		
 
 		@Override
 		public int compareTo(Species other){
 			if(this.speciesCount < other.getSPC()){
-				return -1;
+				return 1;
 			}
 			else if(this.speciesCount == other.getSPC()){
 				return 0;
 			}
 			else{
-				return 1;
+				return -1;
 			}
 		}
 		
-		public void sortBySpecies(){
+		/*
+		public Species[] sortBySpecies(){
 			int size = listS.size();
-			Species[] spA = new Species[size];
+			Species[] spA = new Species[size]; //make new array of Species
 			for (int i=0;i<size;i++){
-				spA[i]=listS.get(i);
+				spA[i]=listS.get(i); //populate the array with unique species
 			}
-			Arrays.sort(spA);
-		}
+			Arrays.sort(spA); //sort the array based on compareTo
+			//return (spA[0].getSP());
+		} */
 
 		
 	}

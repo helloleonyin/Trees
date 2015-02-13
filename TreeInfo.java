@@ -19,15 +19,14 @@ public class TreeInfo {
 	// re-throw it (as it is done in this main()).
 	
 	public static void main(String[] args) throws IOException {
-		String inputFile = "TestTree";
+		String inputFile = args[1];
 		
 		//Create arraylist
 		TreeList tList = new TreeList();
-		TreeList tu =  new TreeList();
 		
 		//create a File object (this can be done even if the file 
 		//does not exist on disk)
-		java.io.File filein = new java.io.File(inputFile+".csv");
+		java.io.File filein = new java.io.File(inputFile);
 		//create a File object (this does not create a file on disk yet)
 		java.io.File fileout = new java.io.File(inputFile+".out");
 		
@@ -45,14 +44,18 @@ public class TreeInfo {
 		//(if the file exists, it gets overwritten)
 		java.io.PrintWriter output = new java.io.PrintWriter(fileout);
 
-		
-		//create species as a parallel array.
+		/**
+		 * this function populates two parallel arrays, one for the species list abbreviations which occur in inth einput files
+		 * the second array corresponds to the abbreviation's full name.
+		 * The integers are counter variables.
+		 */
 		java.io.File speciesFile = new java.io.File("species_list.txt");
 		if (!speciesFile.exists()){
 			System.err.println("No such file species list");
 			System.exit(1);
 		}
 		
+		//this counts the number of unique species in the species input file.
 		Scanner speciesScanner1 = new Scanner(speciesFile);
 		
 		int speciesLen = 0;
@@ -63,18 +66,14 @@ public class TreeInfo {
 		}
 		speciesScanner1.close();
 		
-		System.out.println(speciesLen);
-		
+		//this is where the arrays are populated
 		Scanner speciesScanner = new Scanner(speciesFile);
 
 		String[] sp1 = new String[speciesLen];
 		String[] sp2 = new String[speciesLen];
-		int[] sp3 = new int[speciesLen];
-		int[] sp4 =new int[3];
-		String[] sp5 = new String[3];
 		
 		int i = 0;
-		int q=0;
+		int q;
 		int qq=0;
 		String SA;
 
@@ -90,9 +89,12 @@ public class TreeInfo {
 			sp1[qq]=SA; //populates an array for abbreviations
 			sp2[qq]=SS.toString(); //populates a parallel array for the full name of each tree.
 			qq++;
-		}
-					
-		
+		}		
+		/**
+		 * This function is what creates the Tree objects and populates the TreeList arraylist.
+		 * The boolean is intended to weed out Trees with incomplete information
+		 */
+		int c = 0;
 		input.nextLine(); //ignore the category tabs
 		while (input.hasNext()){
 			boolean validator = true;//to determine if each line is useable to create Tree objects
@@ -105,61 +107,59 @@ public class TreeInfo {
 						validator = false; //returns false if the line is incomplete.
 					}
 				}
-			}
-			if (validator == true){ //creates new tree objects based on the results of the scanner class.
-				Tree TempTree = new Tree(Integer.parseInt(tL[0]),tL[1],tL[2],tL[3],Integer.parseInt(tL[5]),tL[6],tL[7],Integer.parseInt(tL[8]));
-				tList.add1(TempTree);
+				boolean l= true;
+				try { 
+					Integer.parseInt(tL[8]); 
+				} catch(NumberFormatException e) { 
+					l= false; 
+				}
+				
+				if (validator == true){ //creates new tree objects based on the results of the scanner class.
+					Tree TempTree = new Tree(Integer.parseInt(tL[0]),tL[1],tL[2],tL[3],Integer.parseInt(tL[5]),tL[6],tL[7],Integer.parseInt(tL[8]));
+					tList.add1(TempTree);
+					c++;
+					System.out.println(tL[0]);
+					//System.out.println(c);
+					
+				}
 			}
 		}
-		//converts species abreviations to their full name
+		/**
+		 * This function reads each species parameter in each Tree object and converts each abbreviation to the correct species name.
+		 */
 		int tListLen = tList.getCount();
 		int y;
 		int z;
 		for (y=0;y<tListLen;y++){
-			for (z=0;z<speciesLen;z++){
+			for (z=0;z<speciesLen;z++){ //iterates through indexes of the species abbreviation array. 
 				if(tList.getTree(y).getSpecies().equals(sp1[z])){
 					tList.getTree(y).setSpecies(sp2[z]);
-					System.out.println(tList.getTree(y).getSpecies());
+					//System.out.println(tList.getTree(y).getSpecies());
 					
 				} 
 				
 			}
 		}
-		
-		/*
-		//System.out.println(tList.getTree(0).getSpecies());
-		//make list contains
-		int zz=0;
-		int yy=0;
-		for(zz=0;zz<tListLen;zz++){
-			for(yy=0;yy<speciesLen;yy++){
-				if(tList.getTree(zz).getSpecies().equals(sp2[yy])){
-					int index=Arrays.asList(sp2).indexOf(tList.getTree(zz).getSpecies());
-					System.out.println(index+" "+tList.getTree(zz).getSpecies());
-					sp3[index]= sp3[index]+1;
-					System.out.println(sp3[index]);
-					if (sp3[index]>=sp4[2]){
-						sp4[2] = sp3[index];
-						sp5[2] = tList.getTree(yy).getSpecies();
-						if (sp3[index]>=sp4[1]){
-							sp4[1] = sp3[index];
-							sp5[1] = tList.getTree(yy).getSpecies();
-							if (sp3[index]>=sp4[0]){
-								sp4[0] = sp3[index];
-								sp5[0] = tList.getTree(yy).getSpecies();
-							}
-						}
-					}
+		/**
+		 * This function reads each species parameter in each Species object and converts each abbreviation to the correct species name.
+		 */
+		int countS = tList.getListS().size();
+		for (y=0;y<countS;y++){
+			for (z=0;z<speciesLen;z++){
+				if(tList.getListS().get(y).getSP().equals(sp1[z])){
+					tList.getListS().get(y).setSP(sp2[z]);
+					System.out.println(tList.getListS().get(y).getSP());
 					
-				}
+				} 
+				
 			}
-			
-		}*/
-		
-		System.out.println(sp4[0] + sp5[0]);
-		//System.out.println(tList.sortSpecies());//FIX
-		
-		//finds largest diameter tree
+		}
+		/**
+		 * This function finds the largest diameter by iterating through tList and compares the diameter 
+		 * of the tree in question with the previous tree. 
+		 * The value of the largest diameter is stored as max.
+		 * maxL stores the index of the largest tree
+		 */
 		int max = tList.getTree(0).getDiameter();
 		int n;
 		int maxL =0; // max L is the index of the tree with the largest diameter.
@@ -170,13 +170,22 @@ public class TreeInfo {
 			}	
 		}
 		
-		System.out.println(tList.sortBySpecies());
-		
+		//System.out.println(tList.getListS().get(2).getSP());
+		int SALC = tList.getCountS()-1; //Species List Count
+		int ZALC = tList.getCountZ()-1; //Zipcode ArrayList Count
+		Collections.sort(tList.getListS());
+		System.out.println("Most popular Trees:\n\t"+tList.getListS().get(0).getSP()+" "+tList.getListS().get(0).getSPC()+"\n\t"+tList.getListS().get(1).getSP()+" "+tList.getListS().get(1).getSPC()+"\n\t"+tList.getListS().get(2).getSP()+" "+tList.getListS().get(2).getSPC());
+		System.out.println("Least popular Trees:\n\t"+tList.getListS().get(SALC).getSP()+" "+tList.getListS().get(SALC).getSPC()+"\n\t"+tList.getListS().get(SALC-1).getSP()+" "+tList.getListS().get(SALC-1).getSPC()+"\n\t"+tList.getListS().get(SALC-2).getSP()+" "+tList.getListS().get(SALC-2).getSPC());
+		System.out.println("Most Green Zipcode:\n\t"+tList.getListZ().get(0).getZP()+" "+tList.getListZ().get(0).getZC()+"\n\t"+tList.getListZ().get(1).getZP()+" "+tList.getListZ().get(1).getZC()+"\n\t"+tList.getListZ().get(2).getZP()+" "+tList.getListZ().get(2).getZC());
+		System.out.println("Least Green Zipcode:\n\t"+tList.getListZ().get(ZALC).getZP()+" "+tList.getListZ().get(ZALC).getZC()+"\n\t"+tList.getListZ().get(ZALC-1).getZP()+" "+tList.getListZ().get(ZALC-1).getZC()+"\n\t"+tList.getListZ().get(ZALC-2).getZP()+" "+tList.getListZ().get(ZALC-2).getZC());
 		//System.out.println("The largest tree: \n\n\t"+ tList.getTree(maxL).getSpecies()+", "+max+" inches in diameter\n\t"+ tList.getTree(maxL).getAddress());
 		System.out.println(tList.getCount()+" count");
+		System.out.println(tList.getCountS()+" count of species List");
+		System.out.println(tList.getCountZ()+" count of zipcode List");
 		//TODO: Loops to get values in each arraylist to compare
 		
 		output.print("test");
+		System.out.println(tList.getTree(maxL).getMaxD());
 		output.print(tList.getTree(maxL).getMaxD());
 		
 		//System.out.println("a : " + Collections.frequency(tList, "ZESE"));
@@ -185,3 +194,35 @@ public class TreeInfo {
 	speciesScanner.close();
 	}
 }
+
+
+
+/*
+//System.out.println(tList.getTree(0).getSpecies());
+//make list contains
+int zz=0;
+int yy=0;
+for(zz=0;zz<tListLen;zz++){
+	for(yy=0;yy<speciesLen;yy++){
+		if(tList.getTree(zz).getSpecies().equals(sp2[yy])){
+			int index=Arrays.asList(sp2).indexOf(tList.getTree(zz).getSpecies());
+			System.out.println(index+" "+tList.getTree(zz).getSpecies());
+			sp3[index]= sp3[index]+1;
+			System.out.println(sp3[index]);
+			if (sp3[index]>=sp4[2]){
+				sp4[2] = sp3[index];
+				sp5[2] = tList.getTree(yy).getSpecies();
+				if (sp3[index]>=sp4[1]){
+					sp4[1] = sp3[index];
+					sp5[1] = tList.getTree(yy).getSpecies();
+					if (sp3[index]>=sp4[0]){
+						sp4[0] = sp3[index];
+						sp5[0] = tList.getTree(yy).getSpecies();
+					}
+				}
+			}
+			
+		}
+	}
+	
+}*/
