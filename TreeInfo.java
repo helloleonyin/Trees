@@ -34,7 +34,7 @@ public class TreeInfo {
 	 */
 	
 	public static void main(String[] args) throws IOException {
-		String inputFile = args[2];
+		String inputFile = args[0];
 		//create a File object for the input file
 		java.io.File filein = new java.io.File(inputFile);
 		if (!filein.exists()){
